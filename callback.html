@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connecting to Spotify…</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#080810;color:#fff;font-family:'Inter',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:20px}
+  .spinner{width:40px;height:40px;border:2px solid rgba(255,255,255,0.1);border-top-color:#1DB954;border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  p{font-size:14px;color:rgba(255,255,255,0.4);letter-spacing:.05em}
+  .error{color:#f87171;font-size:14px;text-align:center;max-width:360px;line-height:1.6}
+  a{color:#1DB954;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="spinner" id="spinner"></div>
+<p id="status">connecting to spotify…</p>
+
+<script>
+const VERCEL_URL = 'https://YOUR_VERCEL_URL.vercel.app'; // ← REPLACE THIS
+
+async function handleCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const error = params.get('error');
+  const state = params.get('state');
+
+  if (error) {
+    showError(`Spotify login declined: ${error}`);
+    return;
+  }
+  if (!code) {
+    showError('No authorization code received from Spotify.');
+    return;
+  }
+
+  // Verify state to prevent CSRF
+  const savedState = localStorage.getItem('spotify_auth_state');
+  if (state !== savedState) {
+    showError('State mismatch — possible security issue. Please try logging in again.');
+    return;
+  }
+
+  document.getElementById('status').textContent = 'exchanging tokens…';
+
+  try {
+    const res = await fetch(`${VERCEL_URL}/api/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, grant_type: 'authorization_code' }),
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      showError(`Token error: ${data.error_description || data.error}`);
+      return;
+    }
+
+    // Store tokens + expiry
+    const expiresAt = Date.now() + data.expires_in * 1000;
+    localStorage.setItem('spotify_access_token', data.access_token);
+    localStorage.setItem('spotify_token_expires', expiresAt.toString());
+    if (data.refresh_token) {
+      localStorage.setItem('spotify_refresh_token', data.refresh_token);
+    }
+    localStorage.removeItem('spotify_auth_state');
+
+    document.getElementById('status').textContent = 'connected! loading your taste…';
+    setTimeout(() => { window.location.href = 'index.html'; }, 600);
+
+  } catch (err) {
+    showError(`Network error: ${err.message}. Make sure the backend is deployed.`);
+  }
+}
+
+function showError(msg) {
+  document.getElementById('spinner').style.display = 'none';
+  document.getElementById('status').style.display = 'none';
+  const div = document.createElement('div');
+  div.className = 'error';
+  div.innerHTML = `${msg}<br><br><a href="index.html">← back to taste space</a>`;
+  document.body.appendChild(div);
+}
+
+handleCallback();
+</script>
+</body>
+</html>
