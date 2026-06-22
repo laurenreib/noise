@@ -3,198 +3,281 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Taste Space</title>
+<title>taste space</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#080810;--surface:rgba(255,255,255,0.04);--surface2:rgba(255,255,255,0.07);
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
-  --text:rgba(255,255,255,0.9);--muted:rgba(255,255,255,0.4);--dim:rgba(255,255,255,0.2);
-  --green:#1DB954;--green-dim:rgba(29,185,84,0.15);
-  --panel:320px;
+  --bg:#080810;--surface:rgba(255,255,255,0.04);--surface2:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
+  --text:rgba(255,255,255,0.9);--muted:rgba(255,255,255,0.38);--dim:rgba(255,255,255,0.18);
+  --green:#1DB954;--green-dim:rgba(29,185,84,0.12);--green-border:rgba(29,185,84,0.28);
+  --panel-w:300px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
 
-/* ── LOADING / LOGIN SCREENS ── */
-#screen-login,#screen-loading{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+/* ── SCREENS ── */
+#screen-login,#screen-loading{
+  position:fixed;inset:0;background:var(--bg);z-index:1000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+}
 #screen-login.hidden,#screen-loading.hidden{display:none}
-.wordmark{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.login-title{font-size:42px;font-weight:600;letter-spacing:-.02em;line-height:1}
-.login-sub{font-size:15px;color:var(--muted);text-align:center;max-width:380px;line-height:1.6}
-.btn-spotify{background:var(--green);color:#000;border:none;padding:14px 32px;border-radius:99px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.02em;display:flex;align-items:center;gap:10px;transition:transform .15s,background .15s}
-.btn-spotify:hover{background:#1ed760;transform:scale(1.02)}
-.btn-spotify svg{width:20px;height:20px}
-.login-note{font-size:11px;color:var(--dim);text-align:center;max-width:300px;line-height:1.7}
-.loading-bar{width:240px;height:2px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden}
-.loading-fill{height:100%;background:var(--green);border-radius:99px;transition:width .4s ease;width:0%}
-.loading-label{font-size:12px;color:var(--muted);letter-spacing:.08em}
 
-/* ── MAIN APP ── */
+.login-eyebrow{font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--muted)}
+.login-title{font-size:52px;font-weight:600;letter-spacing:-.03em;line-height:.95;text-align:center}
+.login-title span{color:var(--green)}
+.login-sub{font-size:14px;color:var(--muted);text-align:center;max-width:360px;line-height:1.65;margin-top:4px}
+
+.btn-spotify{
+  background:var(--green);color:#000;border:none;
+  padding:15px 36px;border-radius:99px;font-size:14px;font-weight:600;
+  cursor:pointer;letter-spacing:.02em;display:flex;align-items:center;gap:10px;
+  transition:transform .15s,filter .15s;margin-top:8px;font-family:inherit;
+}
+.btn-spotify:hover{filter:brightness(1.1);transform:scale(1.02)}
+.btn-spotify svg{width:18px;height:18px;flex-shrink:0}
+.login-fine{font-size:11px;color:var(--dim);text-align:center;max-width:280px;line-height:1.7}
+
+/* login bg dots */
+#screen-login::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 20% 50%, rgba(29,185,84,0.06) 0%, transparent 60%),
+             radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.06) 0%, transparent 50%),
+             radial-gradient(ellipse at 60% 80%, rgba(99,102,241,0.05) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+.loading-ring{width:40px;height:40px;border:2px solid rgba(255,255,255,0.06);border-top-color:var(--green);border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-track{width:220px;height:2px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-top:4px}
+.loading-fill{height:100%;background:var(--green);border-radius:99px;transition:width .5s ease;width:0%}
+.loading-text{font-size:12px;color:var(--muted);letter-spacing:.06em}
+
+/* ── APP ── */
 #app{display:none;height:100vh;flex-direction:column}
 #app.visible{display:flex}
 
 /* HUD */
-#hud{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;z-index:30;position:relative;background:rgba(8,8,16,0.9);backdrop-filter:blur(12px)}
-.hud-logo{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);font-weight:500;flex-shrink:0}
-.hud-divider{width:1px;height:20px;background:var(--border);flex-shrink:0}
-#user-pill{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:5px 12px 5px 5px;cursor:pointer;transition:background .15s;flex-shrink:0}
-#user-pill:hover{background:var(--surface2)}
-#user-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.1)}
-#user-name{font-size:12px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hud{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  flex-shrink:0;z-index:30;background:rgba(8,8,16,0.92);
+  backdrop-filter:blur(16px);
+}
+.hud-mark{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:500;flex-shrink:0;padding-right:2px}
+.hud-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
+#user-pill{
+  display:flex;align-items:center;gap:7px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:99px;padding:4px 11px 4px 4px;cursor:default;flex-shrink:0;
+}
+#user-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;background:var(--surface2)}
+#user-name{font-size:12px;font-weight:500;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hud-spacer{flex:1}
-.search-wrap{position:relative;flex-shrink:0}
-.search-wrap input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 14px 7px 34px;border-radius:99px;font-size:13px;outline:none;width:200px;transition:all .2s;font-family:inherit}
-.search-wrap input:focus{background:var(--surface2);border-color:var(--border2);width:240px}
-.search-wrap input::placeholder{color:var(--muted)}
-.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
-.hud-tabs{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px}
-.hud-tab{padding:5px 14px;border-radius:99px;font-size:12px;border:none;background:transparent;color:var(--muted);cursor:pointer;letter-spacing:.04em;transition:all .2s;font-family:inherit}
+.hud-tabs{display:flex;gap:1px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px;flex-shrink:0}
+.hud-tab{
+  padding:5px 14px;border-radius:99px;font-size:12px;border:none;
+  background:transparent;color:var(--muted);cursor:pointer;
+  letter-spacing:.03em;transition:all .18s;font-family:inherit;
+}
 .hud-tab.active{background:var(--surface2);color:var(--text)}
-.hud-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:99px;font-size:12px;cursor:pointer;letter-spacing:.04em;transition:all .15s;font-family:inherit;flex-shrink:0}
+.search-wrap{position:relative;flex-shrink:0}
+.search-wrap input{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  padding:6px 13px 6px 32px;border-radius:99px;font-size:12px;outline:none;
+  width:190px;transition:all .2s;font-family:inherit;
+}
+.search-wrap input:focus{background:var(--surface2);border-color:var(--border2);width:230px}
+.search-wrap input::placeholder{color:var(--muted)}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
+.hud-btn{
+  background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  padding:5px 13px;border-radius:99px;font-size:12px;cursor:pointer;
+  letter-spacing:.03em;transition:all .15s;font-family:inherit;flex-shrink:0;
+}
 .hud-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border2)}
-.hud-btn.green{border-color:rgba(29,185,84,0.3);color:var(--green)}
-.hud-btn.green:hover{background:var(--green-dim)}
-#btn-logout{font-size:11px;color:var(--dim);border-color:transparent;padding:5px 10px}
-#btn-logout:hover{color:var(--muted);border-color:var(--border)}
+.hud-btn.accent{border-color:var(--green-border);color:var(--green)}
+.hud-btn.accent:hover{background:var(--green-dim)}
+#btn-logout{font-size:11px;color:var(--dim);border-color:transparent;padding:5px 9px}
+#btn-logout:hover{color:var(--muted)}
 
-/* MAIN LAYOUT */
+/* ── LAYOUT ── */
 #main{display:flex;flex:1;overflow:hidden;position:relative}
 
 /* SIDEBAR */
-#sidebar{width:var(--panel);flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform .3s cubic-bezier(.4,0,.2,1)}
-#sidebar.collapsed{transform:translateX(-100%);margin-left:calc(-1 * var(--panel))}
-.sidebar-section{border-bottom:1px solid var(--border);flex-shrink:0}
-.sidebar-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
-.sidebar-title{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:500}
-.sidebar-count{font-size:10px;color:var(--dim);background:var(--surface);padding:2px 7px;border-radius:99px}
-.sidebar-scroll{overflow-y:auto;flex:1}
-.sidebar-scroll::-webkit-scrollbar{width:3px}
-.sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:99px}
+#sidebar{
+  width:var(--panel-w);flex-shrink:0;
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:width .3s cubic-bezier(.4,0,.2,1),opacity .3s;
+}
+#sidebar.collapsed{width:0;opacity:0;pointer-events:none}
+.sidebar-head{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sidebar-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.sidebar-badge{font-size:10px;color:var(--dim);background:var(--surface);padding:2px 7px;border-radius:99px}
+.sidebar-body{overflow-y:auto;flex:1}
+.sidebar-body::-webkit-scrollbar{width:3px}
+.sidebar-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:99px}
 
-/* Liked songs list */
-.track-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;transition:background .12s;border-radius:0}
-.track-item:hover{background:var(--surface)}
-.track-item.playing{background:var(--green-dim)}
-.track-num{width:18px;font-size:11px;color:var(--dim);text-align:right;flex-shrink:0}
-.track-art{width:36px;height:36px;border-radius:4px;object-fit:cover;background:var(--surface2);flex-shrink:0}
+.track-row{display:flex;align-items:center;gap:9px;padding:7px 14px;cursor:pointer;transition:background .1s}
+.track-row:hover{background:var(--surface)}
+.track-num{width:16px;font-size:10px;color:var(--dim);text-align:right;flex-shrink:0}
+.track-art{width:34px;height:34px;border-radius:4px;object-fit:cover;background:var(--surface2);flex-shrink:0}
 .track-info{flex:1;min-width:0}
-.track-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.track-artist{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.track-dur{font-size:11px;color:var(--dim);flex-shrink:0}
+.track-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-artist{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.track-dur{font-size:10px;color:var(--dim);flex-shrink:0}
 
-/* Playlist chips */
-.playlist-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;transition:background .12s}
-.playlist-item:hover{background:var(--surface)}
-.playlist-item.active{background:var(--green-dim)}
-.playlist-art{width:40px;height:40px;border-radius:6px;object-fit:cover;background:var(--surface2);flex-shrink:0}
-.playlist-info{flex:1;min-width:0}
-.playlist-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.playlist-meta{font-size:11px;color:var(--muted)}
+.pl-row{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;transition:background .1s}
+.pl-row:hover{background:var(--surface)}
+.pl-art{width:38px;height:38px;border-radius:5px;object-fit:cover;background:var(--surface2);flex-shrink:0}
+.pl-info{flex:1;min-width:0}
+.pl-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-meta{font-size:11px;color:var(--muted);margin-top:1px}
 
-/* CANVAS AREA */
+.empty{padding:36px 16px;text-align:center;font-size:12px;color:var(--muted);line-height:1.7}
+
+/* ── CANVAS AREA ── */
 #canvas-area{flex:1;position:relative;overflow:hidden;cursor:grab}
-#canvas-area.dragging{cursor:grabbing}
+#canvas-area.drag{cursor:grabbing}
 canvas{position:absolute;top:0;left:0;pointer-events:none}
 
-/* Axis labels */
-.axis{position:absolute;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.12);pointer-events:none}
-#ax-left{bottom:50px;left:20px}
-#ax-right{bottom:50px;right:20px}
-#ax-top{top:50px;left:50%;transform:translateX(-50%)}
-#ax-bottom{bottom:50px;left:50%;transform:translateX(-50%)}
+.axis-lbl{position:absolute;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,0.1);pointer-events:none;font-family:'Inter',system-ui}
+#ax-l{bottom:56px;left:18px}
+#ax-r{bottom:56px;right:18px}
+#ax-t{top:54px;left:50%;transform:translateX(-50%)}
+#ax-b{bottom:56px;left:50%;transform:translateX(-50%)}
+
+/* STAT PILLS */
+#stats{position:absolute;top:14px;right:14px;z-index:10;display:flex;flex-direction:column;gap:5px}
+.stat{background:rgba(8,8,16,0.75);border:1px solid var(--border);padding:5px 11px;border-radius:7px;font-size:11px;color:var(--muted);backdrop-filter:blur(8px);display:flex;gap:5px}
+.stat strong{color:var(--text);font-weight:500}
 
 /* GENRE PANEL */
-#genre-panel{position:absolute;right:0;top:0;bottom:0;width:360px;background:rgba(8,8,16,0.97);border-left:1px solid var(--border);z-index:20;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;backdrop-filter:blur(20px)}
-#genre-panel.open{transform:translateX(0)}
-#panel-close{position:absolute;top:14px;right:14px;background:var(--surface);border:1px solid var(--border);color:var(--muted);cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit}
-#panel-close:hover{background:var(--surface2);color:var(--text)}
-#panel-scroll{overflow-y:auto;flex:1;padding:24px 20px}
-#panel-scroll::-webkit-scrollbar{width:3px}
-#panel-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:99px}
-.panel-genre-name{font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px}
-.panel-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--border);margin-bottom:16px;margin-right:4px}
-.panel-desc{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.75;margin-bottom:22px}
-.panel-section-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:500}
-.artist-chip{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background .12s;text-decoration:none;color:inherit}
-.artist-chip:hover{background:var(--surface)}
-.artist-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
-.artist-chip-name{font-size:13px;font-weight:500}
-.artist-chip-sub{font-size:11px;color:var(--muted)}
-.neighbor-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
-.neighbor-chip{background:var(--surface);border:1px solid var(--border);padding:6px 12px;border-radius:99px;font-size:12px;cursor:pointer;transition:all .15s}
-.neighbor-chip:hover{background:var(--surface2);border-color:var(--border2)}
-.panel-actions{display:flex;flex-direction:column;gap:8px;margin-top:4px;padding-bottom:24px}
-.panel-btn{width:100%;padding:12px;border-radius:10px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;font-family:inherit;letter-spacing:.02em;font-weight:500}
-.panel-btn.primary{background:var(--green);border:none;color:#000}
-.panel-btn.primary:hover{background:#1ed760}
-.panel-btn.secondary{background:var(--surface);border:1px solid var(--border);color:var(--text)}
-.panel-btn.secondary:hover{background:var(--surface2);border-color:var(--border2)}
-.panel-btn.added{background:var(--green-dim);border:1px solid rgba(29,185,84,0.3);color:var(--green)}
+#gpanel{
+  position:absolute;right:0;top:0;bottom:0;width:350px;
+  background:rgba(7,7,14,0.97);border-left:1px solid var(--border);
+  z-index:20;transform:translateX(100%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(20px);
+}
+#gpanel.open{transform:translateX(0)}
+#gp-close{
+  position:absolute;top:13px;right:13px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;width:26px;height:26px;
+  border-radius:50%;font-size:15px;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;font-family:inherit;
+}
+#gp-close:hover{background:var(--surface2);color:var(--text)}
+#gp-scroll{overflow-y:auto;flex:1;padding:22px 18px 28px}
+#gp-scroll::-webkit-scrollbar{width:3px}
+#gp-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:99px}
 
-/* BOTTOM BAR */
-#bottom-bar{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:15;background:rgba(8,8,16,0.85);border:1px solid var(--border);border-radius:99px;padding:4px;backdrop-filter:blur(12px)}
-.bottom-btn{padding:6px 16px;border-radius:99px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;font-family:inherit}
-.bottom-btn.active{background:var(--surface2);color:var(--text)}
+#gp-name{font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1;margin-bottom:8px}
+.gp-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.gp-tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--border)}
+#gp-desc{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.75;margin-bottom:20px}
+.gp-sec{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;font-weight:500}
+.artist-row{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:8px;cursor:pointer;transition:background .12s;text-decoration:none;color:inherit}
+.artist-row:hover{background:var(--surface)}
+.artist-ico{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.artist-name{font-size:13px;font-weight:500}
+.artist-sub{font-size:11px;color:var(--muted)}
+.nbr-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
+.nbr-chip{background:var(--surface);border:1px solid var(--border);padding:5px 11px;border-radius:99px;font-size:12px;cursor:pointer;transition:all .14s}
+.nbr-chip:hover{background:var(--surface2);border-color:var(--border2)}
+.gp-btns{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+.gp-btn{
+  width:100%;padding:11px;border-radius:9px;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .18s;font-family:inherit;font-weight:500;letter-spacing:.01em;
+}
+.gp-btn.sp{background:var(--green);border:none;color:#000}
+.gp-btn.sp:hover{filter:brightness(1.08)}
+.gp-btn.sec{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.gp-btn.sec:hover{background:var(--surface2);border-color:var(--border2)}
+.gp-btn.added{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green)}
 
 /* LIKED BAR */
-#liked-bar{position:absolute;bottom:16px;left:16px;z-index:15;display:flex;gap:5px;flex-wrap:wrap;max-width:220px;pointer-events:none}
-.liked-chip{background:rgba(8,8,16,0.85);border:1px solid var(--border);padding:5px 11px;border-radius:99px;font-size:11px;cursor:pointer;transition:all .15s;pointer-events:all;backdrop-filter:blur(8px)}
-.liked-chip:hover{background:var(--surface2)}
+#liked-bar{position:absolute;bottom:14px;left:14px;z-index:10;display:flex;gap:5px;flex-wrap:wrap;max-width:200px}
+.lk-chip{
+  background:rgba(8,8,16,0.82);border:1px solid var(--border);
+  padding:4px 10px;border-radius:99px;font-size:11px;cursor:pointer;
+  transition:all .14s;backdrop-filter:blur(8px);
+}
+.lk-chip:hover{background:var(--surface2)}
 
-/* SCAN OVERLAY */
-#scan-pill{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:25;display:none;align-items:center;gap:12px;background:rgba(8,8,16,0.9);border:1px solid var(--border);padding:12px 20px;border-radius:12px;backdrop-filter:blur(16px)}
+/* BOTTOM BAR */
+#bottom-bar{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;gap:3px;z-index:10;
+  background:rgba(8,8,16,0.82);border:1px solid var(--border);
+  border-radius:99px;padding:3px;backdrop-filter:blur(12px);
+}
+.bot-btn{
+  padding:5px 15px;border-radius:99px;font-size:11px;letter-spacing:.07em;
+  text-transform:uppercase;border:none;background:transparent;
+  color:var(--muted);cursor:pointer;transition:all .18s;font-family:inherit;
+}
+.bot-btn.active{background:var(--surface2);color:var(--text)}
+
+/* SCAN */
+#scan-pill{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:25;display:none;align-items:center;gap:10px;
+  background:rgba(8,8,16,0.88);border:1px solid var(--border);
+  padding:11px 18px;border-radius:11px;backdrop-filter:blur(16px);
+}
 #scan-pill.show{display:flex}
-#scan-pill-name{font-size:14px;font-weight:500}
-.scan-stop{background:none;border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:99px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+#scan-name{font-size:14px;font-weight:500}
+.scan-stop{background:none;border:1px solid var(--border);color:var(--muted);padding:4px 11px;border-radius:99px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .14s}
 .scan-stop:hover{color:var(--text);border-color:var(--border2)}
 
 /* TOAST */
-#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:rgba(255,255,255,0.1);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.12);padding:9px 18px;border-radius:99px;font-size:12px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:100;letter-spacing:.02em}
+#toast{
+  position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:rgba(255,255,255,0.09);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.11);padding:8px 17px;
+  border-radius:99px;font-size:12px;opacity:0;transition:all .28s;
+  pointer-events:none;white-space:nowrap;z-index:100;letter-spacing:.02em;
+}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* STATS OVERLAY */
-#stats-overlay{position:absolute;top:16px;right:16px;z-index:15;display:flex;flex-direction:column;gap:6px}
-.stat-pill{background:rgba(8,8,16,0.8);border:1px solid var(--border);padding:6px 12px;border-radius:8px;font-size:11px;color:var(--muted);backdrop-filter:blur(8px);display:flex;gap:6px;align-items:center}
-.stat-pill strong{color:var(--text);font-weight:500}
-
-/* EMPTY STATE */
-.empty-state{padding:40px 20px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7}
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ── -->
+<!-- LOGIN -->
 <div id="screen-login">
-  <div class="wordmark">taste space</div>
-  <div class="login-title">your music,<br>mapped.</div>
-  <div class="login-sub">A spatial explorer for your Spotify library. Navigate genres, discover adjacent artists, and see your taste as a living universe.</div>
+  <div class="login-eyebrow">taste space</div>
+  <div class="login-title">your music,<br><span>mapped.</span></div>
+  <div class="login-sub">Navigate your Spotify library as a spatial universe. Explore genres, find what's adjacent to what you already love.</div>
   <button class="btn-spotify" id="btn-login">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-    connect spotify
+    connect with spotify
   </button>
-  <div class="login-note">Read-only access to your library. Your data stays in your browser — nothing is stored on any server.</div>
+  <div class="login-fine">Read-only access · your data stays in your browser · nothing stored on any server</div>
 </div>
 
-<!-- ── LOADING SCREEN ── -->
+<!-- LOADING -->
 <div id="screen-loading" class="hidden">
-  <div class="wordmark">taste space</div>
-  <div class="loading-bar"><div class="loading-fill" id="loading-fill"></div></div>
-  <div class="loading-label" id="loading-label">loading your library…</div>
+  <div class="login-eyebrow">taste space</div>
+  <div class="loading-ring"></div>
+  <div class="loading-track"><div class="loading-fill" id="lfill"></div></div>
+  <div class="loading-text" id="ltxt">connecting…</div>
 </div>
 
-<!-- ── MAIN APP ── -->
+<!-- APP -->
 <div id="app">
-  <!-- HUD -->
   <div id="hud">
-    <span class="hud-logo">taste space</span>
-    <div class="hud-divider"></div>
+    <span class="hud-mark">taste space</span>
+    <div class="hud-sep"></div>
     <div id="user-pill">
       <img id="user-avatar" src="" alt="">
       <span id="user-name">—</span>
     </div>
-    <div class="hud-divider"></div>
+    <div class="hud-sep"></div>
     <div class="hud-tabs">
       <button class="hud-tab active" data-tab="map">map</button>
       <button class="hud-tab" data-tab="liked">liked songs</button>
@@ -203,84 +286,75 @@ canvas{position:absolute;top:0;left:0;pointer-events:none}
     <div class="hud-spacer"></div>
     <div class="search-wrap">
       <span class="search-icon">⌕</span>
-      <input type="text" id="search" placeholder="search genres, artists…" autocomplete="off" spellcheck="false">
+      <input type="text" id="search-input" placeholder="search genres or artists…" autocomplete="off" spellcheck="false">
     </div>
-    <button class="hud-btn green" id="btn-scan">scan</button>
-    <button class="hud-btn" id="btn-toggle-sidebar">☰ library</button>
+    <button class="hud-btn accent" id="btn-scan">scan universe</button>
+    <button class="hud-btn" id="btn-sidebar">☰ library</button>
     <button class="hud-btn" id="btn-logout">sign out</button>
   </div>
 
-  <!-- MAIN AREA -->
   <div id="main">
-
     <!-- SIDEBAR -->
     <div id="sidebar">
-      <div class="sidebar-section" id="section-liked" style="display:none;flex:1;overflow:hidden;display:flex;flex-direction:column">
-        <div class="sidebar-header">
+      <div id="section-map-hint" style="padding:18px 15px;font-size:12px;color:var(--muted);line-height:1.75">
+        click any genre to explore it<br>scroll or pinch to zoom<br>drag to pan
+      </div>
+      <div id="section-liked" style="display:none;flex:1;min-height:0;flex-direction:column">
+        <div class="sidebar-head">
           <span class="sidebar-title">liked songs</span>
-          <span class="sidebar-count" id="liked-count">0</span>
+          <span class="sidebar-badge" id="liked-count">0</span>
         </div>
-        <div class="sidebar-scroll" id="liked-list"></div>
+        <div class="sidebar-body" id="liked-list"></div>
       </div>
-      <div class="sidebar-section" id="section-playlists" style="display:none;flex:1;overflow:hidden;display:flex;flex-direction:column">
-        <div class="sidebar-header">
+      <div id="section-playlists" style="display:none;flex:1;min-height:0;flex-direction:column">
+        <div class="sidebar-head">
           <span class="sidebar-title">playlists</span>
-          <span class="sidebar-count" id="playlist-count">0</span>
+          <span class="sidebar-badge" id="pl-count">0</span>
         </div>
-        <div class="sidebar-scroll" id="playlist-list"></div>
-      </div>
-      <div id="section-map-hint" style="padding:20px 16px;font-size:12px;color:var(--muted);line-height:1.7">
-        click any genre to explore it · scroll to zoom · drag to pan
+        <div class="sidebar-body" id="pl-list"></div>
       </div>
     </div>
 
     <!-- CANVAS -->
     <div id="canvas-area">
-      <canvas id="starfield"></canvas>
-      <canvas id="genre-canvas"></canvas>
+      <canvas id="stars"></canvas>
+      <canvas id="gc"></canvas>
 
-      <!-- Axis labels -->
-      <div class="axis" id="ax-left">← atmospheric</div>
-      <div class="axis" id="ax-right">bouncy / choppy →</div>
-      <div class="axis" id="ax-top">↑ electronic</div>
-      <div class="axis" id="ax-bottom">↓ organic</div>
+      <div class="axis-lbl" id="ax-l">← atmospheric</div>
+      <div class="axis-lbl" id="ax-r">bouncy / choppy →</div>
+      <div class="axis-lbl" id="ax-t">↑ electronic</div>
+      <div class="axis-lbl" id="ax-b">↓ organic</div>
 
-      <!-- Stats -->
-      <div id="stats-overlay">
-        <div class="stat-pill"><strong id="stat-genres">0</strong> genres mapped</div>
-        <div class="stat-pill"><strong id="stat-tracks">0</strong> tracks loaded</div>
+      <div id="stats">
+        <div class="stat"><strong id="s-genres">35</strong> genres</div>
+        <div class="stat"><strong id="s-tracks">—</strong> tracks loaded</div>
       </div>
 
       <!-- Genre panel -->
-      <div id="genre-panel">
-        <button id="panel-close">×</button>
-        <div id="panel-scroll">
-          <div class="panel-genre-name" id="pg-name"></div>
-          <div id="pg-tags"></div>
-          <div class="panel-desc" id="pg-desc"></div>
-          <div class="panel-section-label">key artists</div>
-          <div id="pg-artists"></div>
-          <div class="panel-section-label" style="margin-top:18px">nearby genres</div>
-          <div class="neighbor-row" id="pg-neighbors"></div>
-          <div class="panel-actions" id="pg-actions"></div>
+      <div id="gpanel">
+        <button id="gp-close">×</button>
+        <div id="gp-scroll">
+          <div id="gp-name"></div>
+          <div class="gp-tags" id="gp-tags"></div>
+          <div id="gp-desc"></div>
+          <div class="gp-sec" style="margin-top:4px">key artists</div>
+          <div id="gp-artists"></div>
+          <div class="gp-sec" style="margin-top:18px">nearby genres</div>
+          <div class="nbr-wrap" id="gp-nbrs"></div>
+          <div class="gp-btns" id="gp-btns"></div>
         </div>
       </div>
 
-      <!-- Liked genres bar -->
       <div id="liked-bar"></div>
-
-      <!-- Bottom mode bar -->
       <div id="bottom-bar">
-        <button class="bottom-btn active" data-mode="genres">genres</button>
-        <button class="bottom-btn" data-mode="artists">artists</button>
-        <button class="bottom-btn" data-mode="mymap">my map</button>
+        <button class="bot-btn active" data-mode="genres">genres</button>
+        <button class="bot-btn" data-mode="artists">artists</button>
+        <button class="bot-btn" data-mode="mymap">my map</button>
       </div>
-
-      <!-- Scan pill -->
       <div id="scan-pill">
-        <span style="font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">scanning</span>
-        <span id="scan-pill-name">—</span>
-        <button class="scan-stop" id="scan-stop-btn">stop</button>
+        <span style="font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">scanning</span>
+        <span id="scan-name">—</span>
+        <button class="scan-stop" id="scan-stop">stop</button>
       </div>
     </div>
   </div>
@@ -289,558 +363,458 @@ canvas{position:absolute;top:0;left:0;pointer-events:none}
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════
-// CONFIG — swap these two lines with your real values
-// ═══════════════════════════════════════════════════
-const SPOTIFY_CLIENT_ID = 'YOUR_CLIENT_ID_HERE';
-const VERCEL_URL        = 'https://YOUR_VERCEL_URL.vercel.app';
-const REDIRECT_URI      = window.location.origin + window.location.pathname.replace('index.html','') + 'callback.html';
-const SCOPES = 'user-read-private user-read-email user-library-read playlist-read-private playlist-read-collaborative';
+// ─── CONFIG (all filled in) ───────────────────────────────────
+const CLIENT_ID   = '238a1e5688c944ddb4ce044a01188108';
+const VERCEL_URL  = 'https://noise1.vercel.app';
+const REDIRECT    = 'https://laurenreib.github.io/taste-space/callback.html';
+const SCOPES      = 'user-read-private user-read-email user-library-read playlist-read-private playlist-read-collaborative';
 
-// ═══════════════════════════════════════════════════
-// GENRE DATA  (x=0 atmospheric→1 choppy, y=0 organic→1 electronic)
-// ═══════════════════════════════════════════════════
+// ─── GENRE DATA ───────────────────────────────────────────────
 const GENRES = [
-  {id:'hyperpop',name:'hyperpop',x:.88,y:.92,size:18,color:'#c084fc',desc:'Maximalist digital pop that weaponizes distortion, pitched vocals, and sensory overload. Born on SoundCloud, shaped by PC Music.',artists:['100 gecs','Charli XCX','Dorian Electra','Sophie'],neighbors:['bubblegum bass','digicore','pc music']},
-  {id:'bubblegum bass',name:'bubblegum bass',x:.82,y:.88,size:13,color:'#e879f9',desc:"The sugary-violent cousin of hyperpop. Squashed beats, candy-colored textures, and club-ready maximalism.",artists:['A.G. Cook','Umru','Spinee'],neighbors:['hyperpop','digicore']},
-  {id:'witch house',name:'witch house',x:.55,y:.75,size:14,color:'#7c3aed',desc:'Drag-and-drop darkness. Slowed R&B samples, occult imagery, and crushed beats that feel like wading through syrup.',artists:['Salem','oOoOO','Balam Acab','Pictureplane'],neighbors:['cloud rap','darksynth','vaporwave']},
-  {id:'darksynth',name:'darksynth',x:.6,y:.82,size:12,color:'#5b21b6',desc:"Neon-black synthesizers. Retrowave's evil twin, built for horror game soundtracks and midnight drives.",artists:['Perturbator','Carpenter Brut','Gost'],neighbors:['witch house','retrowave','techno']},
-  {id:'retrowave',name:'retrowave',x:.55,y:.78,size:16,color:'#4f46e5',desc:"80s synthesis worship. Every song sounds like it belongs in a film you haven't seen but already remember.",artists:['Kavinsky','Gunship','FM-84','Timecop1983'],neighbors:['darksynth','synthwave','vaporwave']},
-  {id:'synthwave',name:'synthwave',x:.5,y:.76,size:17,color:'#6d28d9',desc:'The genre that made sunsets purple again. Analog warmth, pastel glow, and borrowed nostalgia.',artists:['Tycho','Com Truise','Boards of Canada','Washed Out'],neighbors:['retrowave','dream pop','ambient']},
-  {id:'vaporwave',name:'vaporwave',x:.18,y:.72,size:15,color:'#db2777',desc:"Slowed mall muzak as cultural commentary. Capitalism's aesthetics turned melancholic and beautiful.",artists:['Macintosh Plus','Saint Pepsi','2814','猫 シ Corp.'],neighbors:['witch house','synthwave','ambient']},
-  {id:'digicore',name:'digicore',x:.84,y:.85,size:14,color:'#a78bfa',desc:'Bedroom-produced digital rap and emo blended into something entirely Gen Z. Made in MIDI, not studios.',artists:['Crypt','glaive','ericdoa','Midwxst'],neighbors:['hyperpop','emo rap','bubblegum bass']},
-  {id:'emo rap',name:'emo rap',x:.75,y:.72,size:16,color:'#818cf8',desc:'Rap music that cries. Melodic hooks, confessional lyrics, and 808s tuned to hurt.',artists:['Juice WRLD','XXXTentacion','Rod Wave','Lil Uzi Vert'],neighbors:['digicore','cloud rap','bedroom pop']},
-  {id:'cloud rap',name:'cloud rap',x:.68,y:.68,size:15,color:'#6366f1',desc:"Woozy, atmospheric rap built on drugged-out beats. ASAP Mob pioneered this pocket of the universe.",artists:['ASAP Rocky','Bones','Yung Lean','Night Lovell'],neighbors:['emo rap','witch house','lo-fi hip hop']},
-  {id:'lo-fi hip hop',name:'lo-fi hip hop',x:.42,y:.6,size:18,color:'#92400e',desc:"Study music for a generation that doesn't study. Dusty samples, slow beats, and perfect nostalgia.",artists:['Joji','Nujabes','j^p^n','Idealism'],neighbors:['cloud rap','bedroom pop','trip-hop']},
-  {id:'trip-hop',name:'trip-hop',x:.3,y:.65,size:15,color:'#312e81',desc:"Bristol's cinematic hybrid. Hip-hop rhythms under British melancholy. The best mood music ever recorded.",artists:['Massive Attack','Portishead','Tricky','Unkle'],neighbors:['lo-fi hip hop','dream pop','ambient']},
-  {id:'bedroom pop',name:'bedroom pop',x:.38,y:.5,size:16,color:'#b45309',desc:'GarageBand intimacy elevated to art. Imperfections are the point.',artists:['Rex Orange County','Clairo','Beabadoobee','TV Girl'],neighbors:['lo-fi hip hop','dream pop','indie folk']},
-  {id:'dream pop',name:'dream pop',x:.25,y:.45,size:16,color:'#94a3b8',desc:'Soft edges, reverb-soaked vocals, and melodies that drift out of focus before you can hold them.',artists:['Beach House','Cocteau Twins','Mazzy Star','Still Woozy'],neighbors:['shoegaze','bedroom pop','trip-hop']},
-  {id:'shoegaze',name:'shoegaze',x:.28,y:.52,size:17,color:'#a1a1aa',desc:'Guitar pedals as meditation. Bands staring at their feet while sonic walls of fuzz consume everything.',artists:['My Bloody Valentine','Slowdive','Ride','Lush'],neighbors:['dream pop','post-punk','post-rock']},
-  {id:'post-punk',name:'post-punk',x:.35,y:.55,size:16,color:'#71717a',desc:'What punk became when it started reading. Angular guitars, minimal production, and a lot of eyeliner.',artists:['Wire','Joy Division','Gang of Four','Idles'],neighbors:['shoegaze','industrial','noise rock']},
-  {id:'noise rock',name:'noise rock',x:.4,y:.68,size:12,color:'#3f3f46',desc:'Rock music as confrontation. Feedback and atonal dissonance used as compositional tools.',artists:['Sonic Youth','Lightning Bolt','Swans'],neighbors:['post-punk','industrial','post-rock']},
-  {id:'post-rock',name:'post-rock',x:.18,y:.58,size:15,color:'#4b5563',desc:"Rock music that forgot songs needed lyrics. Builds and destroys. 20-minute suites that justify their length.",artists:['Godspeed You! Black Emperor','Mogwai','Explosions in the Sky'],neighbors:['shoegaze','drone','ambient']},
-  {id:'ambient',name:'ambient',x:.05,y:.55,size:18,color:'#1e293b',desc:"Music for spaces. Brian Eno defined it as able to accommodate many levels of listening attention without enforcing any of them.",artists:['Brian Eno','William Basinski','Stars of the Lid','The Caretaker'],neighbors:['drone','post-rock','trip-hop']},
-  {id:'drone',name:'drone',x:.04,y:.62,size:11,color:'#334155',desc:'Single sustained tones held until they become environments. Ancient as Tibetan bowls, futuristic as frequency analysis.',artists:['Sunn O)))','Earth','Stars of the Lid'],neighbors:['ambient','post-rock']},
-  {id:'industrial',name:'industrial',x:.5,y:.88,size:14,color:'#27272a',desc:"Noise as confrontation. Post-punk's most hostile offspring, born from Throbbing Gristle.",artists:['Nine Inch Nails','Einstürzende Neubauten','Death Grips'],neighbors:['techno','post-punk','noise rock']},
-  {id:'techno',name:'techno',x:.65,y:.9,size:18,color:'#0369a1',desc:"Detroit's gift to the world. Industrial minimalism, psychedelic repetition, and the 4/4 grid as religion.",artists:['Jeff Mills','Surgeon','Blawan','Objekt'],neighbors:['industrial','drum and bass','darksynth']},
-  {id:'drum and bass',name:'drum and bass',x:.78,y:.88,size:16,color:'#0284c7',desc:'160 BPM breakbeats and sub-bass that rearranges internal organs. Originated in East London raves.',artists:['Goldie','LTJ Bukem','Noisia','Spectrasoul'],neighbors:['techno','uk garage','grime']},
-  {id:'uk garage',name:'uk garage',x:.72,y:.8,size:14,color:'#0ea5e9',desc:"London's 2-step rhythm section. The bridge between jungle, house, and grime.",artists:['Craig David','MJ Cole','So Solid Crew'],neighbors:['drum and bass','grime','afrobeats']},
-  {id:'grime',name:'grime',x:.78,y:.75,size:15,color:'#0c4a6e',desc:"East London MC culture over harsh 8-bar instrumentals. 140 BPM and aggressive by design.",artists:['Wiley','Skepta','Stormzy','Dizzee Rascal'],neighbors:['uk garage','emo rap','afrobeats']},
-  {id:'afrobeats',name:'afrobeats',x:.82,y:.65,size:17,color:'#047857',desc:"West African rhythm meets Lagos nightlife. The fastest-growing genre on the planet since 2015.",artists:['Burna Boy','Wizkid','Davido','Tems'],neighbors:['grime','amapiano','uk garage']},
-  {id:'amapiano',name:'amapiano',x:.77,y:.62,size:14,color:'#065f46',desc:'South African township jazz meets deep house. Log drums and bubbly bass lines that feel like water.',artists:['DJ Maphorisa','Kabza De Small','Lady Du'],neighbors:['afrobeats','r&b']},
-  {id:'indie folk',name:'indie folk',x:.22,y:.22,size:17,color:'#78716c',desc:'Organic instrumentation and introspective lyricism. Campfire-scaled ambition.',artists:['Bon Iver','Iron & Wine','Fleet Foxes','Sufjan Stevens'],neighbors:['dream pop','singer-songwriter','folk']},
-  {id:'singer-songwriter',name:'singer-songwriter',x:.32,y:.15,size:17,color:'#92400e',desc:"One voice, one instrument, no place to hide. The format that proves or destroys a song in under 4 minutes.",artists:['Elliott Smith','Phoebe Bridgers','Adrianne Lenker','Big Thief'],neighbors:['indie folk','bedroom pop','folk']},
-  {id:'folk',name:'folk',x:.15,y:.08,size:16,color:'#78350f',desc:'Stories first, sound second. Millennia old. Still the most honest format for a confession.',artists:['Nick Drake','John Fahey','Vashti Bunyan','Aldous Harding'],neighbors:['indie folk','singer-songwriter']},
-  {id:'neo-soul',name:'neo-soul',x:.45,y:.32,size:16,color:'#7c2d12',desc:'Soul music with jazz harmonics and hip-hop rhythms. The most spiritually rich corner of the 90s and beyond.',artists:["D'Angelo",'Erykah Badu','Lauryn Hill','Frank Ocean'],neighbors:['r&b','jazz rap','singer-songwriter']},
-  {id:'r&b',name:'r&b',x:.58,y:.35,size:18,color:'#881337',desc:'Rhythms and blues, broadly. The most elastic genre label in music, now spanning decades of reinvention.',artists:['SZA','Frank Ocean','Daniel Caesar','Solange'],neighbors:['neo-soul','emo rap','afrobeats']},
-  {id:'jazz rap',name:'jazz rap',x:.5,y:.38,size:14,color:'#713f12',desc:'Hip-hop that studied. Samples from Blue Note records over complex chord changes.',artists:['A Tribe Called Quest','Kendrick Lamar','Freddie Gibbs','Madlib'],neighbors:['neo-soul','lo-fi hip hop']},
-  {id:'math rock',name:'math rock',x:.52,y:.45,size:13,color:'#065f46',desc:"Odd time signatures, technical guitar interlocking, and the academic thrill of a groove that shouldn't work but does.",artists:['American Football','Tera Melos','Toe','Covet'],neighbors:['post-rock','post-punk','jazz rap']},
-  {id:'pc music',name:'pc music',x:.9,y:.82,size:12,color:'#ec4899',desc:"SOPHIE and A.G. Cook's UK label that made pop music as provocative concept art.",artists:['SOPHIE','A.G. Cook','Hannah Diamond'],neighbors:['hyperpop','bubblegum bass','digicore']},
+  {id:'hyperpop',name:'hyperpop',x:.88,y:.92,sz:18,c:'#c084fc',desc:'Maximalist digital pop that weaponizes distortion, pitched vocals, and sensory overload. Born on SoundCloud, shaped by PC Music.',artists:['100 gecs','Charli XCX','Dorian Electra','Sophie'],nbrs:['bubblegum bass','digicore','pc music']},
+  {id:'bubblegum bass',name:'bubblegum bass',x:.82,y:.88,sz:13,c:'#e879f9',desc:"The sugary-violent cousin of hyperpop. Squashed beats, candy-colored textures, club-ready maximalism.",artists:['A.G. Cook','Umru','Spinee'],nbrs:['hyperpop','digicore']},
+  {id:'witch house',name:'witch house',x:.52,y:.75,sz:14,c:'#7c3aed',desc:'Drag-and-drop darkness. Slowed R&B samples, occult imagery, crushed beats that feel like wading through syrup.',artists:['Salem','oOoOO','Balam Acab','Pictureplane'],nbrs:['cloud rap','darksynth','vaporwave']},
+  {id:'darksynth',name:'darksynth',x:.6,y:.82,sz:12,c:'#5b21b6',desc:"Neon-black synthesizers. Retrowave's evil twin — built for horror game soundtracks and midnight drives.",artists:['Perturbator','Carpenter Brut','Gost'],nbrs:['witch house','retrowave','techno']},
+  {id:'retrowave',name:'retrowave',x:.55,y:.78,sz:16,c:'#4f46e5',desc:"80s synthesis worship. Every song sounds like it belongs in a film you haven't seen but already remember.",artists:['Kavinsky','Gunship','FM-84','Timecop1983'],nbrs:['darksynth','synthwave','vaporwave']},
+  {id:'synthwave',name:'synthwave',x:.5,y:.74,sz:17,c:'#6d28d9',desc:'The genre that made sunsets purple again. Analog warmth, pastel glow, and borrowed nostalgia.',artists:['Tycho','Com Truise','Boards of Canada','Washed Out'],nbrs:['retrowave','dream pop','ambient']},
+  {id:'vaporwave',name:'vaporwave',x:.18,y:.72,sz:15,c:'#db2777',desc:"Slowed mall muzak as cultural commentary. Capitalism's aesthetics turned melancholic and beautiful.",artists:['Macintosh Plus','Saint Pepsi','2814','猫 シ Corp.'],nbrs:['witch house','synthwave','ambient']},
+  {id:'digicore',name:'digicore',x:.84,y:.84,sz:14,c:'#a78bfa',desc:'Bedroom-produced digital rap and emo blended into something entirely Gen Z. Made in MIDI, not studios.',artists:['Crypt','glaive','ericdoa','Midwxst'],nbrs:['hyperpop','emo rap','bubblegum bass']},
+  {id:'emo rap',name:'emo rap',x:.75,y:.71,sz:16,c:'#818cf8',desc:'Rap music that cries. Melodic hooks, confessional lyrics, and 808s tuned to hurt.',artists:['Juice WRLD','XXXTentacion','Rod Wave','Lil Uzi Vert'],nbrs:['digicore','cloud rap','bedroom pop']},
+  {id:'cloud rap',name:'cloud rap',x:.68,y:.67,sz:15,c:'#6366f1',desc:"Woozy, atmospheric rap built on drugged-out beats. ASAP Mob pioneered this pocket of the universe.",artists:['ASAP Rocky','Bones','Yung Lean','Night Lovell'],nbrs:['emo rap','witch house','lo-fi hip hop']},
+  {id:'lo-fi hip hop',name:'lo-fi hip hop',x:.42,y:.6,sz:18,c:'#d97706',desc:"Study music for a generation that doesn't study. Dusty samples, slow beats, and perfect nostalgia.",artists:['Joji','Nujabes','j^p^n','Idealism'],nbrs:['cloud rap','bedroom pop','trip-hop']},
+  {id:'trip-hop',name:'trip-hop',x:.3,y:.65,sz:15,c:'#4338ca',desc:"Bristol's cinematic hybrid. Hip-hop rhythms under British melancholy. The best mood music ever recorded.",artists:['Massive Attack','Portishead','Tricky','Unkle'],nbrs:['lo-fi hip hop','dream pop','ambient']},
+  {id:'bedroom pop',name:'bedroom pop',x:.38,y:.48,sz:16,c:'#b45309',desc:'GarageBand intimacy elevated to art. Imperfections are the point.',artists:['Rex Orange County','Clairo','Beabadoobee','TV Girl'],nbrs:['lo-fi hip hop','dream pop','indie folk']},
+  {id:'dream pop',name:'dream pop',x:.24,y:.44,sz:16,c:'#64748b',desc:'Soft edges, reverb-soaked vocals, and melodies that drift out of focus before you can hold them.',artists:['Beach House','Cocteau Twins','Mazzy Star','Still Woozy'],nbrs:['shoegaze','bedroom pop','trip-hop']},
+  {id:'shoegaze',name:'shoegaze',x:.27,y:.52,sz:17,c:'#94a3b8',desc:'Guitar pedals as meditation. Bands staring at their feet while sonic walls of fuzz consume everything.',artists:['My Bloody Valentine','Slowdive','Ride','Lush'],nbrs:['dream pop','post-punk','post-rock']},
+  {id:'post-punk',name:'post-punk',x:.35,y:.56,sz:16,c:'#71717a',desc:'What punk became when it started reading. Angular guitars, minimal production, and a lot of eyeliner.',artists:['Wire','Joy Division','Gang of Four','Idles'],nbrs:['shoegaze','industrial','noise rock']},
+  {id:'noise rock',name:'noise rock',x:.4,y:.67,sz:12,c:'#52525b',desc:'Rock music as confrontation. Feedback and atonal dissonance used as compositional tools.',artists:['Sonic Youth','Lightning Bolt','Swans'],nbrs:['post-punk','industrial','post-rock']},
+  {id:'post-rock',name:'post-rock',x:.17,y:.57,sz:15,c:'#475569',desc:"Rock music that forgot songs needed lyrics. Builds and destroys. 20-minute suites that justify their length.",artists:['Godspeed You! Black Emperor','Mogwai','Explosions in the Sky'],nbrs:['shoegaze','drone','ambient']},
+  {id:'ambient',name:'ambient',x:.05,y:.54,sz:18,c:'#334155',desc:"Music for spaces. Brian Eno defined it as able to accommodate many levels of listening attention without enforcing any of them.",artists:['Brian Eno','William Basinski','Stars of the Lid','The Caretaker'],nbrs:['drone','post-rock','trip-hop']},
+  {id:'drone',name:'drone',x:.04,y:.62,sz:11,c:'#1e293b',desc:'Single sustained tones held until they become environments. Ancient as Tibetan bowls, futuristic as frequency analysis.',artists:['Sunn O)))','Earth','Stars of the Lid'],nbrs:['ambient','post-rock']},
+  {id:'industrial',name:'industrial',x:.5,y:.88,sz:14,c:'#3f3f46',desc:"Noise as confrontation. Post-punk's most hostile offspring, born from Throbbing Gristle.",artists:['Nine Inch Nails','Einstürzende Neubauten','Death Grips'],nbrs:['techno','post-punk','noise rock']},
+  {id:'techno',name:'techno',x:.65,y:.9,sz:18,c:'#0369a1',desc:"Detroit's gift to the world. Industrial minimalism, psychedelic repetition, and the 4/4 grid as religion.",artists:['Jeff Mills','Surgeon','Blawan','Objekt'],nbrs:['industrial','drum and bass','darksynth']},
+  {id:'drum and bass',name:'drum and bass',x:.78,y:.88,sz:16,c:'#0284c7',desc:'160 BPM breakbeats and sub-bass that rearranges internal organs. Originated in East London raves.',artists:['Goldie','LTJ Bukem','Noisia','Spectrasoul'],nbrs:['techno','uk garage','grime']},
+  {id:'uk garage',name:'uk garage',x:.72,y:.8,sz:14,c:'#0ea5e9',desc:"London's 2-step rhythm section. The bridge between jungle, house, and grime.",artists:['Craig David','MJ Cole','So Solid Crew'],nbrs:['drum and bass','grime','afrobeats']},
+  {id:'grime',name:'grime',x:.78,y:.74,sz:15,c:'#075985',desc:"East London MC culture over harsh 8-bar instrumentals. 140 BPM and aggressive by design.",artists:['Wiley','Skepta','Stormzy','Dizzee Rascal'],nbrs:['uk garage','emo rap','afrobeats']},
+  {id:'afrobeats',name:'afrobeats',x:.82,y:.64,sz:17,c:'#047857',desc:"West African rhythm meets Lagos nightlife. The fastest-growing genre on the planet since 2015.",artists:['Burna Boy','Wizkid','Davido','Tems'],nbrs:['grime','amapiano','uk garage']},
+  {id:'amapiano',name:'amapiano',x:.77,y:.61,sz:14,c:'#065f46',desc:'South African township jazz meets deep house. Log drums and bubbly bass lines that feel like water.',artists:['DJ Maphorisa','Kabza De Small','Lady Du'],nbrs:['afrobeats','r&b']},
+  {id:'indie folk',name:'indie folk',x:.21,y:.21,sz:17,c:'#78716c',desc:'Organic instrumentation and introspective lyricism. Campfire-scaled ambition.',artists:['Bon Iver','Iron & Wine','Fleet Foxes','Sufjan Stevens'],nbrs:['dream pop','singer-songwriter','folk']},
+  {id:'singer-songwriter',name:'singer-songwriter',x:.31,y:.14,sz:17,c:'#92400e',desc:"One voice, one instrument, no place to hide. The format that proves or destroys a song in under 4 minutes.",artists:['Elliott Smith','Phoebe Bridgers','Adrianne Lenker','Big Thief'],nbrs:['indie folk','bedroom pop','folk']},
+  {id:'folk',name:'folk',x:.14,y:.07,sz:16,c:'#78350f',desc:'Stories first, sound second. Millennia old. Still the most honest format for a confession.',artists:['Nick Drake','John Fahey','Vashti Bunyan','Aldous Harding'],nbrs:['indie folk','singer-songwriter']},
+  {id:'neo-soul',name:'neo-soul',x:.44,y:.31,sz:16,c:'#7c2d12',desc:'Soul music with jazz harmonics and hip-hop rhythms. The most spiritually rich corner of the 90s and beyond.',artists:["D'Angelo",'Erykah Badu','Lauryn Hill','Frank Ocean'],nbrs:['r&b','jazz rap','singer-songwriter']},
+  {id:'r&b',name:'r&b',x:.58,y:.34,sz:18,c:'#9f1239',desc:'Rhythms and blues, broadly. The most elastic genre label in music, now spanning decades of reinvention.',artists:['SZA','Frank Ocean','Daniel Caesar','Solange'],nbrs:['neo-soul','emo rap','afrobeats']},
+  {id:'jazz rap',name:'jazz rap',x:.5,y:.37,sz:14,c:'#713f12',desc:'Hip-hop that studied. Samples from Blue Note records over complex chord changes.',artists:['A Tribe Called Quest','Kendrick Lamar','Freddie Gibbs','Madlib'],nbrs:['neo-soul','lo-fi hip hop']},
+  {id:'math rock',name:'math rock',x:.51,y:.44,sz:13,c:'#064e3b',desc:"Odd time signatures, technical guitar interlocking, and the academic thrill of a groove that shouldn't work but does.",artists:['American Football','Tera Melos','Toe','Covet'],nbrs:['post-rock','post-punk','jazz rap']},
+  {id:'pc music',name:'pc music',x:.9,y:.82,sz:12,c:'#be185d',desc:"SOPHIE and A.G. Cook's UK label that made pop music as provocative concept art.",artists:['SOPHIE','A.G. Cook','Hannah Diamond'],nbrs:['hyperpop','bubblegum bass','digicore']},
 ];
 
-const WORLD = 2800, WORLDH = 2000;
+const W = 2800, WH = 2000;
+let vx=0,vy=0,sc=1;
+let dragging=false,dx=0,dy=0,dvx=0,dvy=0;
+let selG=null, hlIds=new Set(), particles=[];
+let scanOn=false, scanTimer=null, gMode='genres';
+let likedG = new Set(JSON.parse(localStorage.getItem('ts_liked_genres')||'[]'));
+let likedTracks=[], playlists=[], userData=null;
 
-// ═══════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════
-function generateState(){
-  const arr = new Uint8Array(16);
-  crypto.getRandomValues(arr);
-  return Array.from(arr, b => b.toString(16).padStart(2,'0')).join('');
+// ─── AUTH ─────────────────────────────────────────────────────
+function randState(){const a=new Uint8Array(16);crypto.getRandomValues(a);return [...a].map(b=>b.toString(16).padStart(2,'0')).join('')}
+
+function doLogin(){
+  const s=randState(); localStorage.setItem('spotify_auth_state',s);
+  const u=new URL('https://accounts.spotify.com/authorize');
+  u.searchParams.set('client_id',CLIENT_ID);
+  u.searchParams.set('response_type','code');
+  u.searchParams.set('redirect_uri',REDIRECT);
+  u.searchParams.set('scope',SCOPES);
+  u.searchParams.set('state',s);
+  window.location.href=u.toString();
 }
 
-function login(){
-  const state = generateState();
-  localStorage.setItem('spotify_auth_state', state);
-  const url = new URL('https://accounts.spotify.com/authorize');
-  url.searchParams.set('client_id', SPOTIFY_CLIENT_ID);
-  url.searchParams.set('response_type', 'code');
-  url.searchParams.set('redirect_uri', REDIRECT_URI);
-  url.searchParams.set('scope', SCOPES);
-  url.searchParams.set('state', state);
-  window.location.href = url.toString();
-}
-
-async function refreshToken(){
-  const rt = localStorage.getItem('spotify_refresh_token');
-  if(!rt) return false;
+async function doRefresh(){
+  const rt=localStorage.getItem('sp_rt'); if(!rt)return false;
   try{
-    const res = await fetch(`${VERCEL_URL}/api/token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({grant_type:'refresh_token',refresh_token:rt})});
-    const data = await res.json();
-    if(data.access_token){
-      localStorage.setItem('spotify_access_token', data.access_token);
-      localStorage.setItem('spotify_token_expires', (Date.now() + data.expires_in*1000).toString());
-      if(data.refresh_token) localStorage.setItem('spotify_refresh_token', data.refresh_token);
-      return true;
-    }
-  }catch(e){}
-  return false;
+    const r=await fetch(`${VERCEL_URL}/api/token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({grant_type:'refresh_token',refresh_token:rt})});
+    const d=await r.json();
+    if(!d.access_token)return false;
+    localStorage.setItem('sp_at',d.access_token);
+    localStorage.setItem('sp_exp',(Date.now()+d.expires_in*1000).toString());
+    if(d.refresh_token)localStorage.setItem('sp_rt',d.refresh_token);
+    return true;
+  }catch{return false;}
 }
 
 async function getToken(){
-  let token = localStorage.getItem('spotify_access_token');
-  const expires = parseInt(localStorage.getItem('spotify_token_expires')||'0');
-  if(!token) return null;
-  if(Date.now() > expires - 60000){
-    const ok = await refreshToken();
-    if(!ok){ clearAuth(); return null; }
-    token = localStorage.getItem('spotify_access_token');
+  let t=localStorage.getItem('sp_at');
+  const exp=parseInt(localStorage.getItem('sp_exp')||'0');
+  if(!t)return null;
+  if(Date.now()>exp-60000){const ok=await doRefresh();if(!ok){wipeAuth();return null;}t=localStorage.getItem('sp_at');}
+  return t;
+}
+
+function wipeAuth(){['sp_at','sp_rt','sp_exp'].forEach(k=>localStorage.removeItem(k));}
+
+async function api(path){
+  const t=await getToken(); if(!t)throw new Error('no token');
+  const r=await fetch(`https://api.spotify.com/v1${path}`,{headers:{Authorization:`Bearer ${t}`}});
+  if(r.status===401){wipeAuth();location.reload();}
+  return r.json();
+}
+
+// ─── DATA LOADING ─────────────────────────────────────────────
+function prog(pct,txt){
+  document.getElementById('lfill').style.width=pct+'%';
+  document.getElementById('ltxt').textContent=txt;
+}
+
+async function fetchLiked(){
+  let all=[],offset=0,total=Infinity;
+  while(all.length<total&&all.length<500){
+    const d=await api(`/me/tracks?limit=50&offset=${offset}`);
+    if(!d.items)break;
+    all.push(...d.items); total=d.total; offset+=50;
+    prog(25+Math.round((all.length/Math.min(total,500))*45),`loading liked songs… ${all.length}`);
+    if(d.items.length<50)break;
   }
-  return token;
+  return all;
 }
 
-function clearAuth(){
-  ['spotify_access_token','spotify_refresh_token','spotify_token_expires'].forEach(k=>localStorage.removeItem(k));
+async function fetchPlaylists(){
+  const d=await api('/me/playlists?limit=50');
+  return d.items||[];
 }
 
-async function apiFetch(path){
-  const token = await getToken();
-  if(!token) throw new Error('no token');
-  const res = await fetch(`https://api.spotify.com/v1${path}`,{headers:{Authorization:`Bearer ${token}`}});
-  if(res.status===401){clearAuth();window.location.reload();}
-  return res.json();
-}
-
-// ═══════════════════════════════════════════════════
-// DATA LOADING
-// ═══════════════════════════════════════════════════
-let userData = null;
-let likedTracks = [];
-let userPlaylists = [];
-let likedGenreIds = new Set(JSON.parse(localStorage.getItem('liked_genres')||'[]'));
-
-function setProgress(pct, label){
-  document.getElementById('loading-fill').style.width = pct+'%';
-  document.getElementById('loading-label').textContent = label;
-}
-
-async function loadAllLikedSongs(){
-  let tracks = [], offset = 0, total = Infinity;
-  while(tracks.length < total){
-    const data = await apiFetch(`/me/tracks?limit=50&offset=${offset}`);
-    if(!data.items) break;
-    tracks.push(...data.items);
-    total = Math.min(data.total, 500); // cap at 500 for perf
-    offset += 50;
-    const pct = 30 + Math.round((tracks.length/total)*40);
-    setProgress(pct, `loading liked songs… ${tracks.length} of ${Math.min(total,data.total)}`);
-    if(data.items.length < 50) break;
-  }
-  return tracks;
-}
-
-async function loadPlaylists(){
-  const data = await apiFetch('/me/playlists?limit=50');
-  return data.items || [];
-}
-
-async function loadAndStart(){
+async function boot(){
   document.getElementById('screen-login').classList.add('hidden');
   document.getElementById('screen-loading').classList.remove('hidden');
-  setProgress(5,'connecting to spotify…');
+  prog(5,'connecting to spotify…');
   try{
-    userData = await apiFetch('/me');
-    setProgress(20,'fetching your library…');
-    const [tracks, playlists] = await Promise.all([loadAllLikedSongs(), loadPlaylists()]);
-    likedTracks = tracks;
-    userPlaylists = playlists;
-    setProgress(80,'building your taste map…');
-    // Cache
-    localStorage.setItem('ts_liked_tracks', JSON.stringify(tracks.slice(0,200)));
-    localStorage.setItem('ts_playlists', JSON.stringify(playlists.slice(0,50)));
-    localStorage.setItem('ts_user', JSON.stringify(userData));
-    localStorage.setItem('ts_cache_time', Date.now().toString());
-    setProgress(100,'ready.');
-    await new Promise(r=>setTimeout(r,400));
-    startApp();
+    userData=await api('/me');
+    prog(20,'fetching your library…');
+    [likedTracks,playlists]=await Promise.all([fetchLiked(),fetchPlaylists()]);
+    prog(80,'building your taste map…');
+    localStorage.setItem('ts_tracks',JSON.stringify(likedTracks.slice(0,200)));
+    localStorage.setItem('ts_playlists',JSON.stringify(playlists.slice(0,50)));
+    localStorage.setItem('ts_user',JSON.stringify(userData));
+    localStorage.setItem('ts_cache',Date.now().toString());
+    prog(100,'ready.');
+    await new Promise(r=>setTimeout(r,350));
+    launch();
   }catch(e){
+    document.getElementById('ltxt').textContent='something went wrong — try refreshing';
     console.error(e);
-    document.getElementById('loading-label').textContent = 'error loading — try refreshing';
   }
 }
 
-function loadFromCache(){
-  userData = JSON.parse(localStorage.getItem('ts_user')||'null');
-  likedTracks = JSON.parse(localStorage.getItem('ts_liked_tracks')||'[]');
-  userPlaylists = JSON.parse(localStorage.getItem('ts_playlists')||'[]');
+function loadCache(){
+  userData=JSON.parse(localStorage.getItem('ts_user')||'null');
+  likedTracks=JSON.parse(localStorage.getItem('ts_tracks')||'[]');
+  playlists=JSON.parse(localStorage.getItem('ts_playlists')||'[]');
 }
 
-// ═══════════════════════════════════════════════════
-// APP START
-// ═══════════════════════════════════════════════════
-function startApp(){
+// ─── LAUNCH ───────────────────────────────────────────────────
+function launch(){
   document.getElementById('screen-loading').classList.add('hidden');
   document.getElementById('app').classList.add('visible');
-
-  // User pill
   if(userData){
-    const img = document.getElementById('user-avatar');
-    if(userData.images&&userData.images[0]) img.src=userData.images[0].url;
-    document.getElementById('user-name').textContent = userData.display_name||userData.id;
+    const av=document.getElementById('user-avatar');
+    if(userData.images?.[0])av.src=userData.images[0].url;
+    document.getElementById('user-name').textContent=userData.display_name||userData.id;
   }
-
-  // Stats
-  document.getElementById('stat-genres').textContent = GENRES.length;
-  document.getElementById('stat-tracks').textContent = likedTracks.length;
-
-  populateLikedList();
-  populatePlaylistList();
-  initCanvas();
-  bindUI();
-  updateLikedBar();
-
-  // Auto-refresh token every 50 min
-  setInterval(refreshToken, 50*60*1000);
+  document.getElementById('s-tracks').textContent=likedTracks.length;
+  buildLikedList(); buildPlaylists();
+  initCanvas(); bindUI(); updateLikedBar();
+  setInterval(doRefresh,50*60*1000);
 }
 
-// ═══════════════════════════════════════════════════
-// SIDEBAR POPULATION
-// ═══════════════════════════════════════════════════
-function formatDur(ms){
-  const s=Math.floor(ms/1000);
-  return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+// ─── SIDEBAR ──────────────────────────────────────────────────
+function fmt(ms){const s=Math.floor(ms/1000);return`${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function buildLikedList(){
+  const el=document.getElementById('liked-list');
+  document.getElementById('liked-count').textContent=likedTracks.length;
+  if(!likedTracks.length){el.innerHTML='<div class="empty">no liked songs found</div>';return;}
+  el.innerHTML=likedTracks.map((item,i)=>{
+    const t=item.track; const art=t.album.images[2]?.url||t.album.images[0]?.url||'';
+    return`<div class="track-row" onclick="window.open('${t.external_urls.spotify}','_blank')">
+      <div class="track-num">${i+1}</div>
+      <img class="track-art" src="${art}" loading="lazy" alt="">
+      <div class="track-info">
+        <div class="track-name">${esc(t.name)}</div>
+        <div class="track-artist">${esc(t.artists.map(a=>a.name).join(', '))}</div>
+      </div>
+      <div class="track-dur">${fmt(t.duration_ms)}</div>
+    </div>`;
+  }).join('');
 }
 
-function populateLikedList(){
-  const el = document.getElementById('liked-list');
-  document.getElementById('liked-count').textContent = likedTracks.length;
-  el.innerHTML = likedTracks.length===0
-    ? '<div class="empty-state">no liked songs found</div>'
-    : likedTracks.map((item,i)=>{
-      const t = item.track;
-      const art = t.album.images[2]?.url||t.album.images[0]?.url||'';
-      return `<div class="track-item" onclick="openSpotify('${t.external_urls.spotify}')">
-        <div class="track-num">${i+1}</div>
-        <img class="track-art" src="${art}" loading="lazy" alt="">
-        <div class="track-info">
-          <div class="track-name">${esc(t.name)}</div>
-          <div class="track-artist">${esc(t.artists.map(a=>a.name).join(', '))}</div>
-        </div>
-        <div class="track-dur">${formatDur(t.duration_ms)}</div>
-      </div>`;
-    }).join('');
+function buildPlaylists(){
+  const el=document.getElementById('pl-list');
+  document.getElementById('pl-count').textContent=playlists.length;
+  if(!playlists.length){el.innerHTML='<div class="empty">no playlists found</div>';return;}
+  el.innerHTML=playlists.map(p=>{
+    const art=p.images?.[0]?.url||'';
+    return`<div class="pl-row" onclick="window.open('${p.external_urls.spotify}','_blank')">
+      <img class="pl-art" src="${art}" loading="lazy" alt="">
+      <div class="pl-info">
+        <div class="pl-name">${esc(p.name)}</div>
+        <div class="pl-meta">${p.tracks.total} tracks</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function populatePlaylistList(){
-  const el = document.getElementById('playlist-list');
-  document.getElementById('playlist-count').textContent = userPlaylists.length;
-  el.innerHTML = userPlaylists.length===0
-    ? '<div class="empty-state">no playlists found</div>'
-    : userPlaylists.map(p=>{
-      const art = p.images&&p.images[0]?p.images[0].url:'';
-      return `<div class="playlist-item" onclick="openSpotify('${p.external_urls.spotify}')">
-        <img class="playlist-art" src="${art}" loading="lazy" alt="">
-        <div class="playlist-info">
-          <div class="playlist-name">${esc(p.name)}</div>
-          <div class="playlist-meta">${p.tracks.total} tracks</div>
-        </div>
-      </div>`;
-    }).join('');
-}
-
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-window.openSpotify = url=>window.open(url,'_blank');
-
-// ═══════════════════════════════════════════════════
-// CANVAS / MAP ENGINE
-// ═══════════════════════════════════════════════════
-let viewX=0,viewY=0,scale=1;
-let isDragging=false,dragX=0,dragY=0,dvX=0,dvY=0;
-let selectedGenre=null;
-let highlightIds=new Set();
-let particles=[];
-let scanInterval=null, scanRunning=false;
-let genreMode='genres';
-
+// ─── CANVAS ───────────────────────────────────────────────────
 function initCanvas(){
-  const area = document.getElementById('canvas-area');
-  const starCanvas = document.getElementById('starfield');
-  const gc = document.getElementById('genre-canvas');
-  function resize(){
-    const w=area.clientWidth, h=area.clientHeight;
-    starCanvas.width=gc.width=w; starCanvas.height=gc.height=h;
-    drawStars(starCanvas.getContext('2d'));
+  const area=document.getElementById('canvas-area');
+  const sc_=document.getElementById('stars');
+  const gc=document.getElementById('gc');
+  function rsz(){
+    const w=area.clientWidth,h=area.clientHeight;
+    sc_.width=gc.width=w; sc_.height=gc.height=h;
+    drawStars(sc_.getContext('2d'),w,h);
   }
-  window.addEventListener('resize',resize); resize();
+  window.addEventListener('resize',rsz); rsz();
 
-  area.addEventListener('mousedown',e=>{isDragging=true;dragX=e.clientX;dragY=e.clientY;dvX=viewX;dvY=viewY;area.classList.add('dragging')});
-  window.addEventListener('mousemove',e=>{if(!isDragging)return;viewX=dvX-(e.clientX-dragX)/scale;viewY=dvY-(e.clientY-dragY)/scale});
+  area.addEventListener('mousedown',e=>{dragging=true;dx=e.clientX;dy=e.clientY;dvx=vx;dvy=vy;area.classList.add('drag')});
+  window.addEventListener('mousemove',e=>{if(!dragging)return;vx=dvx-(e.clientX-dx)/sc;vy=dvy-(e.clientY-dy)/sc});
   window.addEventListener('mouseup',e=>{
-    if(isDragging&&Math.abs(e.clientX-dragX)<5&&Math.abs(e.clientY-dragY)<5) handleClick(e,gc);
-    isDragging=false;area.classList.remove('dragging');
+    if(dragging&&Math.abs(e.clientX-dx)<5&&Math.abs(e.clientY-dy)<5)click(e,gc,area);
+    dragging=false;area.classList.remove('drag');
   });
   area.addEventListener('wheel',e=>{
     e.preventDefault();
-    const wp=s2w(e.clientX-area.getBoundingClientRect().left,e.clientY-area.getBoundingClientRect().top,gc);
-    scale*=e.deltaY<0?1.12:.88; scale=Math.max(.2,Math.min(4,scale));
-    const rect=area.getBoundingClientRect();
-    viewX=wp.x-(e.clientX-rect.left-gc.width/2)/scale;
-    viewY=wp.y-(e.clientY-rect.top-gc.height/2)/scale;
+    const r=area.getBoundingClientRect();
+    const wp=s2w(e.clientX-r.left,e.clientY-r.top,gc);
+    sc=Math.max(.18,Math.min(4.5,sc*(e.deltaY<0?1.12:.89)));
+    vx=wp.x-(e.clientX-r.left-gc.width/2)/sc;
+    vy=wp.y-(e.clientY-r.top-gc.height/2)/sc;
   },{passive:false});
-
-  // Touch
   let lt=null;
-  area.addEventListener('touchstart',e=>{if(e.touches.length===1){isDragging=true;dragX=e.touches[0].clientX;dragY=e.touches[0].clientY;dvX=viewX;dvY=viewY}},{passive:true});
+  area.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dx=e.touches[0].clientX;dy=e.touches[0].clientY;dvx=vx;dvy=vy}},{passive:true});
   area.addEventListener('touchmove',e=>{
     e.preventDefault();
-    if(e.touches.length===2){
-      const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-      if(lt){scale=Math.max(.2,Math.min(4,scale*(d/lt)));} lt=d;
-    } else if(isDragging&&e.touches.length===1){viewX=dvX-(e.touches[0].clientX-dragX)/scale;viewY=dvY-(e.touches[0].clientY-dragY)/scale;}
+    if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(lt)sc=Math.max(.18,Math.min(4.5,sc*(d/lt)));lt=d;}
+    else if(dragging&&e.touches.length===1){vx=dvx-(e.touches[0].clientX-dx)/sc;vy=dvy-(e.touches[0].clientY-dy)/sc;}
   },{passive:false});
-  area.addEventListener('touchend',e=>{lt=null;isDragging=false;});
-
+  area.addEventListener('touchend',()=>{lt=null;dragging=false;});
   requestAnimationFrame(()=>renderLoop(gc));
 }
 
-function drawStars(ctx){
-  ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
-  const r=n=>{ let x=Math.sin(n)*10000; return x-Math.floor(x); };
-  for(let i=0;i<300;i++){
-    const x=r(i*7.3)*ctx.canvas.width, y=r(i*11.7)*ctx.canvas.height;
-    const rad=r(i*3.1)*1.5, a=0.08+r(i*5.9)*0.3;
-    ctx.beginPath(); ctx.arc(x,y,rad,0,Math.PI*2);
-    ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fill();
+function drawStars(ctx,w,h){
+  ctx.clearRect(0,0,w,h);
+  const r=n=>{let x=Math.sin(n)*10000;return x-Math.floor(x)};
+  for(let i=0;i<280;i++){
+    ctx.beginPath();ctx.arc(r(i*7.3)*w,r(i*11.7)*h,r(i*3.1)*1.4,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${.06+r(i*5.9)*.28})`;ctx.fill();
   }
 }
 
-function gPos(g){ return {x:g.x*WORLD-WORLD/2, y:(1-g.y)*WORLDH-WORLDH/2}; }
-function w2s(wx,wy,c){ return {x:(wx-viewX)*scale+c.width/2, y:(wy-viewY)*scale+c.height/2}; }
-function s2w(sx,sy,c){ return {x:(sx-c.width/2)/scale+viewX, y:(sy-c.height/2)/scale+viewY}; }
+function gp(g){return{x:g.x*W-W/2,y:(1-g.y)*WH-WH/2}}
+function w2s(wx,wy,c){return{x:(wx-vx)*sc+c.width/2,y:(wy-vy)*sc+c.height/2}}
+function s2w(sx,sy,c){return{x:(sx-c.width/2)/sc+vx,y:(sy-c.height/2)/sc+vy}}
 
-function handleClick(e, c){
-  const rect=c.parentElement.getBoundingClientRect();
-  const wp=s2w(e.clientX-rect.left, e.clientY-rect.top, c);
-  let closest=null, cD=Infinity;
+function click(e,gc,area){
+  const r=area.getBoundingClientRect();
+  const wp=s2w(e.clientX-r.left,e.clientY-r.top,gc);
+  let best=null,bd=Infinity;
   GENRES.forEach(g=>{
-    const p=gPos(g), dx=p.x-wp.x, dy=p.y-wp.y;
-    const sd=Math.sqrt(dx*dx+dy*dy)*scale;
-    const fs=Math.max(9,g.size*scale*1.2);
-    if(sd<fs*3&&sd<cD){cD=sd;closest=g;}
+    const p=gp(g),ddx=p.x-wp.x,ddy=p.y-wp.y;
+    const sd=Math.sqrt(ddx*ddx+ddy*ddy)*sc;
+    const fs=Math.max(9,g.sz*sc*1.2);
+    if(sd<fs*3.5&&sd<bd){bd=sd;best=g;}
   });
-  if(closest) openGenrePanel(closest); else closeGenrePanel();
+  if(best)openPanel(best); else closePanel();
 }
 
 function renderLoop(c){
   const ctx=c.getContext('2d');
   ctx.clearRect(0,0,c.width,c.height);
 
-  // Grid
-  ctx.strokeStyle='rgba(255,255,255,0.022)'; ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(255,255,255,0.02)';ctx.lineWidth=1;
   for(let i=-3;i<=3;i++){
-    const sx=w2s(i*(WORLD/4),0,c).x;
-    ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,c.height);ctx.stroke();
-    const sy=w2s(0,i*(WORLDH/4),c).y;
-    ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(c.width,sy);ctx.stroke();
+    let s=w2s(i*(W/4),0,c);ctx.beginPath();ctx.moveTo(s.x,0);ctx.lineTo(s.x,c.height);ctx.stroke();
+    s=w2s(0,i*(WH/4),c);ctx.beginPath();ctx.moveTo(0,s.y);ctx.lineTo(c.width,s.y);ctx.stroke();
   }
 
-  // Connection lines
-  if(selectedGenre){
-    selectedGenre.neighbors.forEach(nid=>{
-      const n=GENRES.find(g=>g.id===nid||g.name===nid); if(!n)return;
-      const sp=w2s(...Object.values(gPos(selectedGenre)),c);
-      const np=w2s(...Object.values(gPos(n)),c);
-      ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(np.x,np.y);
-      ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.setLineDash([4,6]);ctx.stroke();ctx.setLineDash([]);
+  if(selG){
+    selG.nbrs.forEach(nid=>{
+      const n=GENRES.find(g=>g.id===nid); if(!n)return;
+      const a=w2s(...Object.values(gp(selG)),c),b=w2s(...Object.values(gp(n)),c);
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle='rgba(255,255,255,0.09)';ctx.lineWidth=1;ctx.setLineDash([3,6]);ctx.stroke();ctx.setLineDash([]);
     });
   }
 
-  // Particles
   particles=particles.filter(p=>p.life>0);
   particles.forEach(p=>{
-    ctx.globalAlpha=p.life*.8;ctx.fillStyle=p.color;
+    ctx.globalAlpha=p.life*.75;ctx.fillStyle=p.c;
     ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fill();
-    p.x+=p.vx;p.y+=p.vy;p.life-=0.05;
+    p.x+=p.vx;p.y+=p.vy;p.life-=.048;
   });
   ctx.globalAlpha=1;
 
-  // Genres
   GENRES.forEach(g=>{
-    const wp=gPos(g), sp=w2s(wp.x,wp.y,c);
-    if(sp.x<-300||sp.x>c.width+300||sp.y<-100||sp.y>c.height+100)return;
-    const isSel=selectedGenre&&selectedGenre.id===g.id;
-    const isNbr=selectedGenre&&(selectedGenre.neighbors.includes(g.id)||selectedGenre.neighbors.includes(g.name));
-    const isLiked=likedGenreIds.has(g.id);
-    const isHl=highlightIds.has(g.id);
-    const dim=selectedGenre&&!isSel&&!isNbr&&!isLiked?0.15:1;
-    const mymap=genreMode==='mymap';
-    if(mymap&&!isLiked)return;
-    const fs=Math.max(9,Math.min(g.size*scale*1.2,36));
-    ctx.font=`${isSel||isLiked?600:400} ${fs}px Inter,system-ui,sans-serif`;
+    const wp=gp(g),sp=w2s(wp.x,wp.y,c);
+    if(sp.x<-250||sp.x>c.width+250||sp.y<-80||sp.y>c.height+80)return;
+    const isSel=selG&&selG.id===g.id;
+    const isNbr=selG&&selG.nbrs.includes(g.id);
+    const isLk=likedG.has(g.id);
+    const isHl=hlIds.has(g.id);
+    if(gMode==='mymap'&&!isLk)return;
+    const dim=selG&&!isSel&&!isNbr&&!isLk?.14:1;
+    const fs=Math.max(9,Math.min(g.sz*sc*1.2,38));
+    ctx.font=`${isSel||isLk?600:400} ${fs}px Inter,system-ui,sans-serif`;
     ctx.textAlign='center';ctx.textBaseline='middle';
-    if(isSel||isLiked){ctx.shadowColor=g.color;ctx.shadowBlur=isSel?22:12;}
-    const alpha=dim*(isHl?1:isSel?1:isNbr?.88:isLiked?.85:scale<.5?.4:.65);
-    ctx.globalAlpha=alpha;
-    ctx.fillStyle=isSel||isNbr||isLiked?g.color:(isHl?'#fff':'rgba(255,255,255,0.7)');
+    if(isSel||isLk){ctx.shadowColor=g.c;ctx.shadowBlur=isSel?24:14;}
+    ctx.globalAlpha=dim*(isHl?1:isSel?1:isNbr?.9:isLk?.85:sc<.45?.35:.62);
+    ctx.fillStyle=isSel||isNbr||isLk?g.c:isHl?'#fff':'rgba(255,255,255,0.68)';
     ctx.fillText(g.name,sp.x,sp.y);
     ctx.shadowBlur=0;ctx.globalAlpha=1;
-    if(isLiked){
-      ctx.globalAlpha=.9;ctx.beginPath();
+    if(isLk){
       const tw=ctx.measureText(g.name).width;
-      ctx.arc(sp.x+tw/2+5,sp.y-fs/2,3.5,0,Math.PI*2);
-      ctx.fillStyle=g.color;ctx.fill();ctx.globalAlpha=1;
+      ctx.beginPath();ctx.arc(sp.x+tw/2+5,sp.y-fs/2,3.5,0,Math.PI*2);
+      ctx.fillStyle=g.c;ctx.globalAlpha=.9;ctx.fill();ctx.globalAlpha=1;
     }
   });
 
   requestAnimationFrame(()=>renderLoop(c));
 }
 
-// ═══════════════════════════════════════════════════
-// GENRE PANEL
-// ═══════════════════════════════════════════════════
-function openGenrePanel(g){
-  selectedGenre=g;
-  document.getElementById('pg-name').textContent=g.name;
-  document.getElementById('pg-name').style.color=g.color;
-  document.getElementById('pg-tags').innerHTML=
-    `<span class="panel-tag" style="border-color:${g.color}44;color:${g.color}">${g.x>.5?'choppy':'atmospheric'}</span>`+
-    `<span class="panel-tag" style="border-color:${g.color}44;color:${g.color}">${g.y>.5?'electronic':'organic'}</span>`;
-  document.getElementById('pg-desc').textContent=g.desc;
-  document.getElementById('pg-artists').innerHTML=g.artists.map(a=>
-    `<a class="artist-chip" href="https://open.spotify.com/search/${encodeURIComponent(a)}" target="_blank">
-      <div class="artist-icon" style="background:${g.color}22;color:${g.color}">${a[0]}</div>
-      <div><div class="artist-chip-name">${a}</div><div class="artist-chip-sub">artist</div></div>
+// ─── GENRE PANEL ──────────────────────────────────────────────
+function openPanel(g){
+  selG=g;
+  const pn=document.getElementById('gp-name');
+  pn.textContent=g.name; pn.style.color=g.c;
+  document.getElementById('gp-tags').innerHTML=
+    `<span class="gp-tag" style="border-color:${g.c}44;color:${g.c}">${g.x>.5?'choppy':'atmospheric'}</span>`+
+    `<span class="gp-tag" style="border-color:${g.c}44;color:${g.c}">${g.y>.5?'electronic':'organic'}</span>`;
+  document.getElementById('gp-desc').textContent=g.desc;
+  document.getElementById('gp-artists').innerHTML=g.artists.map(a=>
+    `<a class="artist-row" href="https://open.spotify.com/search/${encodeURIComponent(a)}" target="_blank">
+      <div class="artist-ico" style="background:${g.c}1a;color:${g.c}">${a[0]}</div>
+      <div><div class="artist-name">${a}</div><div class="artist-sub">open on spotify</div></div>
     </a>`).join('');
-  document.getElementById('pg-neighbors').innerHTML=(g.neighbors||[]).map(nid=>{
-    const n=GENRES.find(x=>x.id===nid||x.name===nid);
-    return n?`<span class="neighbor-chip" onclick="navTo('${n.id}')">${n.name}</span>`:'';
+  document.getElementById('gp-nbrs').innerHTML=g.nbrs.map(nid=>{
+    const n=GENRES.find(x=>x.id===nid); if(!n)return'';
+    return`<span class="nbr-chip" onclick="goTo('${n.id}')">${n.name}</span>`;
   }).join('');
-  const inMap=likedGenreIds.has(g.id);
-  document.getElementById('pg-actions').innerHTML=
-    `<button class="panel-btn primary" onclick="openSpotify('https://open.spotify.com/search/${encodeURIComponent(g.name)}')">▶  explore on spotify</button>`+
-    `<button class="panel-btn ${inMap?'added':'secondary'}" id="btn-add-genre">${inMap?'✓  in your map':'+ add to my map'}</button>`;
-  document.getElementById('btn-add-genre').onclick=()=>{
-    toggleLikedGenre(g);
-    const inM=likedGenreIds.has(g.id);
-    document.getElementById('btn-add-genre').textContent=inM?'✓  in your map':'+ add to my map';
-    document.getElementById('btn-add-genre').className=`panel-btn ${inM?'added':'secondary'}`;
+  const inMap=likedG.has(g.id);
+  document.getElementById('gp-btns').innerHTML=
+    `<button class="gp-btn sp" onclick="window.open('https://open.spotify.com/search/${encodeURIComponent(g.name)}','_blank')">▶  explore on spotify</button>`+
+    `<button class="gp-btn ${inMap?'added':'sec'}" id="gp-add">${inMap?'✓  in your map':'＋  add to my map'}</button>`;
+  document.getElementById('gp-add').onclick=()=>{
+    toggleG(g);
+    const im=likedG.has(g.id);
+    document.getElementById('gp-add').textContent=im?'✓  in your map':'＋  add to my map';
+    document.getElementById('gp-add').className=`gp-btn ${im?'added':'sec'}`;
   };
-  document.getElementById('genre-panel').classList.add('open');
+  document.getElementById('gpanel').classList.add('open');
 }
 
-function closeGenrePanel(){
-  selectedGenre=null;
-  document.getElementById('genre-panel').classList.remove('open');
-}
-document.getElementById('panel-close').addEventListener('click',closeGenrePanel);
+function closePanel(){selG=null;document.getElementById('gpanel').classList.remove('open');}
+document.getElementById('gp-close').addEventListener('click',closePanel);
 
-window.navTo=function(id){
-  const g=GENRES.find(x=>x.id===id||x.name===id); if(!g)return;
-  const wp=gPos(g); viewX=wp.x; viewY=wp.y; scale=1.5;
-  setTimeout(()=>openGenrePanel(g),200);
+window.goTo=function(id){
+  const g=GENRES.find(x=>x.id===id); if(!g)return;
+  const p=gp(g); vx=p.x; vy=p.y; sc=1.5;
+  setTimeout(()=>openPanel(g),180);
 };
 
-function toggleLikedGenre(g){
-  if(likedGenreIds.has(g.id)) likedGenreIds.delete(g.id);
+function toggleG(g){
+  if(likedG.has(g.id)){likedG.delete(g.id);}
   else{
-    likedGenreIds.add(g.id);
-    const wp=gPos(g), sp=w2s(wp.x,wp.y,document.getElementById('genre-canvas'));
-    for(let i=0;i<8;i++) particles.push({x:sp.x,y:sp.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,life:1,color:g.color});
+    likedG.add(g.id);
+    const p=gp(g),sp=w2s(p.x,p.y,document.getElementById('gc'));
+    for(let i=0;i<9;i++)particles.push({x:sp.x,y:sp.y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5,life:1,c:g.c});
     toast(`${g.name} added to your map`);
   }
-  localStorage.setItem('liked_genres',JSON.stringify([...likedGenreIds]));
+  localStorage.setItem('ts_liked_genres',JSON.stringify([...likedG]));
   updateLikedBar();
 }
 
 function updateLikedBar(){
-  const bar=document.getElementById('liked-bar');
-  bar.innerHTML=[...likedGenreIds].map(id=>{
+  document.getElementById('liked-bar').innerHTML=[...likedG].map(id=>{
     const g=GENRES.find(x=>x.id===id); if(!g)return'';
-    return `<span class="liked-chip" onclick="navTo('${g.id}')" style="border-color:${g.color}55;color:${g.color}">${g.name}</span>`;
+    return`<span class="lk-chip" onclick="goTo('${g.id}')" style="border-color:${g.c}44;color:${g.c}">${g.name}</span>`;
   }).join('');
-  document.getElementById('stat-genres').textContent=likedGenreIds.size||GENRES.length;
 }
 
-// ═══════════════════════════════════════════════════
-// UI BINDINGS
-// ═══════════════════════════════════════════════════
+// ─── UI BINDINGS ──────────────────────────────────────────────
 function bindUI(){
-  // Tabs
-  document.querySelectorAll('.hud-tab').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      document.querySelectorAll('.hud-tab').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const tab=btn.dataset.tab;
-      document.getElementById('section-liked').style.display=tab==='liked'?'flex':'none';
-      document.getElementById('section-playlists').style.display=tab==='playlists'?'flex':'none';
-      document.getElementById('section-map-hint').style.display=tab==='map'?'block':'none';
-      if(tab!=='map') document.getElementById('sidebar').classList.remove('collapsed');
-    });
-  });
+  document.querySelectorAll('.hud-tab').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.hud-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const t=btn.dataset.tab;
+    const sb=document.getElementById('sidebar');
+    document.getElementById('section-map-hint').style.display=t==='map'?'block':'none';
+    const sl=document.getElementById('section-liked');
+    const sp=document.getElementById('section-playlists');
+    sl.style.display=t==='liked'?'flex':'none';
+    sp.style.display=t==='playlists'?'flex':'none';
+    if(t!=='map')sb.classList.remove('collapsed');
+  }));
 
-  // Mode buttons
-  document.querySelectorAll('.bottom-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      document.querySelectorAll('.bottom-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active'); genreMode=btn.dataset.mode;
-    });
-  });
+  document.querySelectorAll('.bot-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.bot-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); gMode=btn.dataset.mode;
+  }));
 
-  // Search
-  document.getElementById('search').addEventListener('input',e=>{
+  document.getElementById('search-input').addEventListener('input',e=>{
     const q=e.target.value.toLowerCase().trim();
-    if(!q){highlightIds=new Set();return;}
-    highlightIds=new Set(GENRES.filter(g=>g.name.toLowerCase().includes(q)||g.artists.some(a=>a.toLowerCase().includes(q))||g.desc.toLowerCase().includes(q)).map(g=>g.id));
-    if(highlightIds.size===1){const g=GENRES.find(g=>highlightIds.has(g.id));if(g){const wp=gPos(g);viewX=wp.x;viewY=wp.y;scale=1.6;}}
+    if(!q){hlIds=new Set();return;}
+    hlIds=new Set(GENRES.filter(g=>g.name.toLowerCase().includes(q)||g.artists.some(a=>a.toLowerCase().includes(q))).map(g=>g.id));
+    if(hlIds.size===1){const g=GENRES.find(g=>hlIds.has(g.id));if(g){const p=gp(g);vx=p.x;vy=p.y;sc=1.6;}}
   });
 
-  // Scan
   document.getElementById('btn-scan').addEventListener('click',()=>{
-    if(scanRunning){stopScan();return;}
-    scanRunning=true;
-    document.getElementById('btn-scan').textContent='stop';
+    if(scanOn){stopScan();return;}
+    scanOn=true;
+    document.getElementById('btn-scan').textContent='stop scan';
     document.getElementById('scan-pill').classList.add('show');
-    const shuffled=[...GENRES].sort(()=>Math.random()-.5);
-    let i=0;
-    scanInterval=setInterval(()=>{
-      if(i>=shuffled.length){stopScan();return;}
-      const g=shuffled[i++];
-      document.getElementById('scan-pill-name').textContent=g.name;
-      const wp=gPos(g); viewX+=(wp.x-viewX)*.35; viewY+=(wp.y-viewY)*.35; scale=1.3;
-    },1400);
+    const sh=[...GENRES].sort(()=>Math.random()-.5); let i=0;
+    scanTimer=setInterval(()=>{
+      if(i>=sh.length){stopScan();return;}
+      const g=sh[i++]; document.getElementById('scan-name').textContent=g.name;
+      const p=gp(g); vx+=(p.x-vx)*.32; vy+=(p.y-vy)*.32; sc=1.25;
+    },1300);
   });
-  document.getElementById('scan-stop-btn').addEventListener('click',stopScan);
+  document.getElementById('scan-stop').addEventListener('click',stopScan);
 
-  document.getElementById('btn-toggle-sidebar').addEventListener('click',()=>{
+  document.getElementById('btn-sidebar').addEventListener('click',()=>{
     document.getElementById('sidebar').classList.toggle('collapsed');
   });
 
   document.getElementById('btn-logout').addEventListener('click',()=>{
-    clearAuth();
-    localStorage.removeItem('ts_user');localStorage.removeItem('ts_liked_tracks');localStorage.removeItem('ts_playlists');localStorage.removeItem('ts_cache_time');
-    window.location.reload();
+    wipeAuth();
+    ['ts_user','ts_tracks','ts_playlists','ts_cache'].forEach(k=>localStorage.removeItem(k));
+    location.reload();
   });
 }
 
 function stopScan(){
-  clearInterval(scanInterval);scanRunning=false;
-  document.getElementById('btn-scan').textContent='scan';
+  clearInterval(scanTimer);scanOn=false;
+  document.getElementById('btn-scan').textContent='scan universe';
   document.getElementById('scan-pill').classList.remove('show');
 }
 
 function toast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2400);
+  setTimeout(()=>t.classList.remove('show'),2300);
 }
 
-// ═══════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════
+// ─── INIT ─────────────────────────────────────────────────────
 (async function init(){
-  const token = await getToken();
-  const cacheTime = parseInt(localStorage.getItem('ts_cache_time')||'0');
-  const cacheAge = Date.now() - cacheTime;
-  const CACHE_TTL = 30*60*1000; // 30 min
-
-  if(token && cacheAge < CACHE_TTL && localStorage.getItem('ts_user')){
-    loadFromCache();
-    startApp();
+  const token=await getToken();
+  const age=Date.now()-parseInt(localStorage.getItem('ts_cache')||'0');
+  if(token&&age<30*60*1000&&localStorage.getItem('ts_user')){
+    loadCache(); launch();
   } else if(token){
-    loadAndStart();
+    boot();
   } else {
     document.getElementById('screen-login').style.display='flex';
-    document.getElementById('btn-login').addEventListener('click',login);
+    document.getElementById('btn-login').addEventListener('click',doLogin);
   }
 })();
 </script>

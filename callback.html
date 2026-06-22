@@ -3,23 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connecting to Spotify…</title>
+<title>Connecting — taste space</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:#080810;color:#fff;font-family:'Inter',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:20px}
-  .spinner{width:40px;height:40px;border:2px solid rgba(255,255,255,0.1);border-top-color:#1DB954;border-radius:50%;animation:spin .8s linear infinite}
+  .logo{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px}
+  .spinner{width:36px;height:36px;border:2px solid rgba(255,255,255,0.08);border-top-color:#1DB954;border-radius:50%;animation:spin .8s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
-  p{font-size:14px;color:rgba(255,255,255,0.4);letter-spacing:.05em}
-  .error{color:#f87171;font-size:14px;text-align:center;max-width:360px;line-height:1.6}
+  p{font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:.04em}
+  .error-box{color:#f87171;font-size:13px;text-align:center;max-width:340px;line-height:1.7;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);padding:16px 20px;border-radius:10px}
   a{color:#1DB954;text-decoration:none}
 </style>
 </head>
 <body>
+<div class="logo">taste space</div>
 <div class="spinner" id="spinner"></div>
 <p id="status">connecting to spotify…</p>
 
 <script>
-const VERCEL_URL = 'https://YOUR_VERCEL_URL.vercel.app'; // ← REPLACE THIS
+const VERCEL_URL = 'https://noise1.vercel.app';
 
 async function handleCallback() {
   const params = new URLSearchParams(window.location.search);
@@ -28,18 +30,17 @@ async function handleCallback() {
   const state = params.get('state');
 
   if (error) {
-    showError(`Spotify login declined: ${error}`);
+    showError(`Spotify declined: ${error}. <br><br><a href="index.html">← go back</a>`);
     return;
   }
   if (!code) {
-    showError('No authorization code received from Spotify.');
+    showError('No code received from Spotify. <br><br><a href="index.html">← go back</a>');
     return;
   }
 
-  // Verify state to prevent CSRF
   const savedState = localStorage.getItem('spotify_auth_state');
   if (state !== savedState) {
-    showError('State mismatch — possible security issue. Please try logging in again.');
+    showError('Security check failed. Please try logging in again. <br><br><a href="index.html">← go back</a>');
     return;
   }
 
@@ -54,11 +55,10 @@ async function handleCallback() {
     const data = await res.json();
 
     if (data.error) {
-      showError(`Token error: ${data.error_description || data.error}`);
+      showError(`Spotify error: ${data.error_description || data.error}<br><br><a href="index.html">← go back</a>`);
       return;
     }
 
-    // Store tokens + expiry
     const expiresAt = Date.now() + data.expires_in * 1000;
     localStorage.setItem('spotify_access_token', data.access_token);
     localStorage.setItem('spotify_token_expires', expiresAt.toString());
@@ -67,11 +67,11 @@ async function handleCallback() {
     }
     localStorage.removeItem('spotify_auth_state');
 
-    document.getElementById('status').textContent = 'connected! loading your taste…';
-    setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    document.getElementById('status').textContent = 'connected — loading your taste…';
+    setTimeout(() => { window.location.href = 'index.html'; }, 700);
 
   } catch (err) {
-    showError(`Network error: ${err.message}. Make sure the backend is deployed.`);
+    showError(`Connection failed: ${err.message}<br><br>Make sure the Vercel backend is deployed.<br><br><a href="index.html">← go back</a>`);
   }
 }
 
@@ -79,8 +79,8 @@ function showError(msg) {
   document.getElementById('spinner').style.display = 'none';
   document.getElementById('status').style.display = 'none';
   const div = document.createElement('div');
-  div.className = 'error';
-  div.innerHTML = `${msg}<br><br><a href="index.html">← back to taste space</a>`;
+  div.className = 'error-box';
+  div.innerHTML = msg;
   document.body.appendChild(div);
 }
 
